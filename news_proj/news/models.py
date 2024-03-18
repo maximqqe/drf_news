@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -18,6 +19,7 @@ class News(models.Model):
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     category = models.ForeignKey(to=Category, on_delete=models.PROTECT)
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'news'
