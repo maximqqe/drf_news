@@ -1,3 +1,5 @@
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
 from news.models import News, Category
@@ -18,8 +20,24 @@ class NewsViewSet(viewsets.ModelViewSet):
     serializer_class = NewsSerializer
     pagination_class = NewsPagination
 
+    @method_decorator(cache_page(10, key_prefix="news-list"))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @method_decorator(cache_page(60*5, key_prefix="news"))
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
 
 class CategoryViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly, ]
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+    @method_decorator(cache_page(10, key_prefix="category-list"))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @method_decorator(cache_page(60*5, key_prefix="category"))
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
