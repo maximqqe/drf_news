@@ -1,5 +1,6 @@
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
+from drf_spectacular.utils import extend_schema_view, extend_schema
 from rest_framework import viewsets
 from rest_framework.generics import ListAPIView
 from rest_framework.pagination import PageNumberPagination
@@ -15,6 +16,14 @@ class NewsPagination(PageNumberPagination):
     max_page_size = 50
 
 
+@extend_schema_view(
+    list=extend_schema(summary='get all news', tags=['news', ]),
+    retrieve=extend_schema(summary='get specific news', tags=['news', ]),
+    create=extend_schema(summary='create news', tags=['news', ]),
+    destroy=extend_schema(summary='delete specific news', tags=['news', ]),
+    update=extend_schema(summary='update existing news', tags=['news', ]),
+    partial_update=extend_schema(summary='partially update existing news', tags=['news', ]),
+)
 class NewsViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly, ]
     queryset = News.objects.all()
@@ -30,6 +39,14 @@ class NewsViewSet(viewsets.ModelViewSet):
         return super().retrieve(request, *args, **kwargs)
 
 
+@extend_schema_view(
+    list=extend_schema(summary='get all categories', tags=['category', ]),
+    retrieve=extend_schema(summary='get specific category', tags=['category', ]),
+    create=extend_schema(summary='create category', tags=['category', ]),
+    destroy=extend_schema(summary='delete specific category', tags=['category', ]),
+    update=extend_schema(summary='update existing category', tags=['category', ]),
+    partial_update=extend_schema(summary='partially update existing category', tags=['category', ]),
+)
 class CategoryViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly, ]
     queryset = Category.objects.all()
@@ -44,6 +61,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return super().retrieve(request, *args, **kwargs)
 
 
+@extend_schema_view(get=extend_schema(summary='get all news of a certain category', tags=['news', 'category']),)
 class NewsCategoryAPIView(ListAPIView):
     serializer_class = NewsSerializer
     lookup_url_kwarg = 'cat_id'
